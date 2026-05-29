@@ -19,19 +19,22 @@ services:
     container_name: lab-apache
     networks:
       - lab-network
+    env_file:
+      - .env
 
     ##Live copy source code to container
     volumes:
       - ./apache/src:/var/www/html
+      - ./.env:/var/www/html/.env
 
   mysql:
     image: mysql:8.0
     container_name: lab-mysql
     environment:
-      MYSQL_ROOT_PASSWORD: rootpass
-      MYSQL_DATABASE:      labdb
-      MYSQL_USER:          labuser
-      MYSQL_PASSWORD:      labpass
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE:      ${MYSQL_DATABASE}
+      MYSQL_USER:          ${MYSQL_USER}
+      MYSQL_PASSWORD:      ${MYSQL_PASSWORD}
     volumes:
       - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
       - mysql-data:/var/lib/mysql
