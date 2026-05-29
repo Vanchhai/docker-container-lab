@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+
+  nginx:
+    image: nginx:alpine
+    container_name: lab-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - apache
+    networks:
+      - lab-network
+
+  apache:
+    build: ./apache
+    container_name: lab-apache
+    networks:
+      - lab-network
+
+    ##Live copy source code to container
+    volumes:
+      - ./apache/src:/var/www/html
+
+  mysql:
+    image: mysql:8.0
+    container_name: lab-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE:      labdb
+      MYSQL_USER:          labuser
+      MYSQL_PASSWORD:      labpass
+    volumes:
+      - ./mysql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - mysql-data:/var/lib/mysql
+    networks:
+      - lab-network
+
+networks:
+  lab-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
